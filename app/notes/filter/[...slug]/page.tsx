@@ -1,12 +1,12 @@
 import NotesClient from "../../Notes.client";
 
 interface NotesFilterProps {
-  params: Promise<{ tag?: string[] }>;
+  params: Promise<{ slug?: string[] }>;
 }
 
 const NotesFilter = async ({ params }: NotesFilterProps) => {
-  const { tag } = await params;
-  const currentTag = tag?.[0];
+  const { slug } = await params;
+  const currentTag = slug?.[0];
 
   const tagParam =
     currentTag && currentTag.toLowerCase() !== "all"
