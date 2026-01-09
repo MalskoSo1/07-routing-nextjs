@@ -1,0 +1,79 @@
+"use client";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import NoteList from "../../components/NoteList/NoteList";
+import css from "./page.module.css";
+import { fetchNotes } from "../../lib/api";
+import { useState } from "react";
+import Pagination from "../../components/Pagination/Pagination";
+import Modal from "../../components/Modal/Modal";
+import NoteForm from "../../components/NoteForm/NoteForm";
+import SearchBox from "../../components/SearchBox/SearchBox";
+import { useDebounce } from "use-debounce";
+import Loader from "@/components/Loader/Loader";
+import ErrorMessage from "@/components/ErrorMessage/ErrorMessage";
+
+const NotesClient = () => {
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [debouncedSearch] = useDebounce(search, 700);
+
+  const perPage = 12;
+
+  const { data, isSuccess, isError, error, isLoading } = useQuery({
+    queryKey: ["getNotes", debouncedSearch, page],
+    queryFn: () => fetchNotes(debouncedSearch, page, perPage),
+    placeholderData: keepPreviousData,
+    refetchOnMount: false,
+  });
+
+  if (isError) {
+    throw error;
+  }
+
+  const newSearch = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  return (
+    <div className={css.app}>
+      <header className={css.toolbar}>
+        <SearchBox value={search} onChange={newSearch} />
+        {isSuccess && data.totalPages > 1 && (
+          <Pagination
+            page={page}
+            totalPages={data.totalPages}
+            setPage={setPage}
+          />
+        )}
+        <button className={css.button} onClick={openModal}>
+          Create note +
+        </button>
+      </header>
+      {data && data?.notes.length > 0 && <NoteList notes={data.notes} />}
+      {data?.notes.length === 0 && (
+        <ErrorMessage message={"No notes were found, try another search"} />
+      )}
+      {isError && (
+        <ErrorMessage message={"There was an error, please try again..."} />
+      )}
+      {!isError && isLoading && <Loader />}
+      {isModalOpen && (
+        <Modal onClose={closeModal}>
+          <NoteForm setIsModalOpen={setIsModalOpen} />
+        </Modal>
+      )}
+    </div>
+  );
+};
+
+export default NotesClient;
