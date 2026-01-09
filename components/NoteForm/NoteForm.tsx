@@ -15,10 +15,6 @@ interface NoteFormProps {
 export default function NoteForm({ setIsModalOpen }: NoteFormProps) {
   const queryClient = useQueryClient();
 
-  const handleSubmit = (data: FormValues) => {
-    createNoteMutation.mutate(data);
-  };
-
   const createNoteMutation = useMutation({
     mutationKey: ["createNote"],
     mutationFn: (data: NewNote) => createNote(data),
@@ -27,6 +23,10 @@ export default function NoteForm({ setIsModalOpen }: NoteFormProps) {
       setIsModalOpen(false);
     },
   });
+
+  const handleSubmit = (data: FormValues) => {
+    createNoteMutation.mutate(data);
+  };
 
   const FormSchema = Yup.object().shape({
     title: Yup.string()

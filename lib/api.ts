@@ -19,19 +19,23 @@ const instance = axios.create({
 export async function fetchNotes(
   search: string,
   page: number,
-  perPage: number
+  perPage: number,
+  tag?: string
 ): Promise<fetchNotesProps> {
   const params: {
     page: number;
     perPage: number;
     search?: string;
+    tag?: string;
   } = {
     page,
     perPage,
   };
 
-  if (search.trim() !== "") {
-    params.search = search;
+  if (search.trim()) params.search = search;
+
+  if (tag && tag !== "all") {
+    params.tag = tag;
   }
 
   const response = await instance.get<fetchNotesProps>("/notes", { params });

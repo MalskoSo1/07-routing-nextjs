@@ -12,7 +12,11 @@ import { useDebounce } from "use-debounce";
 import Loader from "@/components/Loader/Loader";
 import ErrorMessage from "@/components/ErrorMessage/ErrorMessage";
 
-const NotesClient = () => {
+interface NotesClientProps {
+  currentTag?: string;
+}
+
+const NotesClient = ({ currentTag }: NotesClientProps) => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,10 +25,10 @@ const NotesClient = () => {
   const perPage = 12;
 
   const { data, isSuccess, isError, error, isLoading } = useQuery({
-    queryKey: ["getNotes", debouncedSearch, page],
-    queryFn: () => fetchNotes(debouncedSearch, page, perPage),
+    queryKey: ["getNotes", debouncedSearch, page, currentTag],
+    queryFn: () => fetchNotes(debouncedSearch, page, perPage, currentTag),
     placeholderData: keepPreviousData,
-    refetchOnMount: false,
+    // refetchOnMount: false,
   });
 
   if (isError) {
@@ -60,13 +64,17 @@ const NotesClient = () => {
         </button>
       </header>
       {data && data?.notes.length > 0 && <NoteList notes={data.notes} />}
-      {data?.notes.length === 0 && (
+      {data?.notes.length === 0 && search !== "" && (
         <ErrorMessage message={"No notes were found, try another search"} />
+      )}
+      {data?.notes.length === 0 && search === "" && (
+        <ErrorMessage message={"No notes were found, try another tag"} />
       )}
       {isError && (
         <ErrorMessage message={"There was an error, please try again..."} />
       )}
       {!isError && isLoading && <Loader />}
+
       {isModalOpen && (
         <Modal onClose={closeModal}>
           <NoteForm setIsModalOpen={setIsModalOpen} />
