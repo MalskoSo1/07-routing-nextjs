@@ -26,8 +26,8 @@ const NotesFilter = async ({ params }: NotesFilterProps) => {
   const perPage = 12;
 
   await queryClient.prefetchQuery({
-    queryKey: ["getNotes", debouncedSearch, page],
-    queryFn: () => fetchNotes(debouncedSearch, page, perPage),
+    queryKey: ["getNotes", debouncedSearch, page, currentTag],
+    queryFn: () => fetchNotes(debouncedSearch, page, perPage, currentTag),
   });
 
   return (

@@ -1,9 +1,7 @@
-"use client";
-
 import Link from "next/link";
 import css from "./default.module.css";
 import { NoteTag } from "@/types/note";
-import { useQueryClient } from "@tanstack/react-query";
+// import { useQueryClient } from "@tanstack/react-query";
 
 const tags: NoteTag[] = ["Work", "Personal", "Meeting", "Shopping", "Todo"];
 
